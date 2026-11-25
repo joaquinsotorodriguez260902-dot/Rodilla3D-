@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Rodilla 3D · Anatomía y lesiones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070d18;--panel:#0d1729;--surface:#14233b;--line:#263b5d;--ink:#edf4ff;--muted:#9aacc8;--cyan:#42c9e8;--blue:#579bff;--amber:#f5bd55;--red:#ff596b;--green:#63d6aa;--purple:#ba91ff;--fontd:'Chakra Petch',system-ui,sans-serif;--fontb:'Inter',system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--fontb);font-size:13px}body{overflow:hidden}button,select,input{font:inherit;color:inherit}button{cursor:pointer}
+#app{height:100dvh;display:grid;grid-template-columns:minmax(0,1fr) 350px;grid-template-rows:62px minmax(0,1fr)}
+header{grid-column:1/-1;display:flex;align-items:center;gap:13px;padding:0 18px;background:linear-gradient(90deg,#10213a,#0b1425 60%,#1b1421);border-bottom:1px solid var(--line);position:relative;z-index:5}
+header:after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--red),var(--amber))}
+.logo{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#14304b;border:1px solid #326080;color:#8be4f1;font-size:20px}
+h1{font:700 19px var(--fontd);margin:0;letter-spacing:.5px}h1 span{color:var(--cyan)}header p{margin:2px 0 0;color:var(--muted);font-size:10.5px}
+.spacer{flex:1}.headbtn,.btn{border:1px solid var(--line);background:#172945;border-radius:10px;padding:9px 12px;font-weight:600;font-size:12px;transition:.18s}
+.headbtn:hover,.btn:hover{border-color:var(--cyan);transform:translateY(-1px)}.headbtn.off{color:var(--muted)}
+#stage{position:relative;min-width:0;overflow:hidden;background:radial-gradient(ellipse at 48% 40%,#17304b 0%,#0a1628 48%,#070d18 100%)}
+#viewport{position:absolute;inset:0}#viewport canvas{display:block;width:100%;height:100%}
+#badge{position:absolute;top:16px;left:16px;padding:11px 14px;border-radius:13px;background:#091525dc;border:1px solid #31506d;border-left:4px solid var(--cyan);backdrop-filter:blur(8px);z-index:2;max-width:min(380px,calc(100% - 32px))}
+#badge b{font:700 16px var(--fontd);display:block;color:var(--cyan)}#badge small{color:var(--muted);font-size:10px}
+#hint{position:absolute;top:18px;right:18px;background:#091525c9;border:1px solid var(--line);padding:8px 12px;border-radius:30px;color:var(--muted);font-size:10.5px}
+#info{position:absolute;left:16px;bottom:118px;width:min(350px,calc(100% - 32px));padding:14px 16px;border-radius:13px;background:#091525ed;border:1px solid var(--cyan);box-shadow:0 10px 35px #0008;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:3}
+#info.show{opacity:1;transform:none;pointer-events:auto}#info strong{font:700 16px var(--fontd);color:var(--cyan)}#info p{line-height:1.5;color:#c9d7e9;margin:6px 0 0}#info button{float:right;background:none;border:0;font-size:20px;color:var(--muted)}
+#timeline{position:absolute;bottom:13px;left:14px;right:14px;padding:11px 13px 9px;border:1px solid var(--line);border-radius:13px;background:#081323df;backdrop-filter:blur(8px);z-index:2}
+#timeline .top{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font:600 10px var(--fontd);margin-bottom:7px}
+#progress{height:5px;border-radius:5px;background:#1b2d48;overflow:hidden}#progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--amber))}
+#timeline .phases{display:flex;justify-content:space-between;gap:4px;margin-top:8px}#timeline .phases span{font-size:9px;color:#8094b2}
+#panel{overflow-y:auto;background:linear-gradient(180deg,#0e192c,#091321);border-left:1px solid var(--line);padding:16px 15px 24px}
+.sec{margin-bottom:18px}.sec h2{font:700 11px var(--fontd);letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}.sec h2:before{content:"";width:14px;height:3px;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--purple))}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.btn.primary{background:linear-gradient(135deg,#174e68,#18375d);border-color:#34799b}.btn.danger{background:linear-gradient(135deg,#632c40,#3b2037);border-color:#9a4259}
+.wide{width:100%}.control{margin-top:11px}.label{display:flex;justify-content:space-between;gap:8px;margin-bottom:6px;font-size:11.5px;font-weight:600}.label output{font:600 12px var(--fontd);color:var(--cyan)}
+input[type=range]{width:100%;accent-color:var(--cyan)}select{width:100%;padding:9px 10px;border-radius:9px;background:#172945;border:1px solid var(--line);outline:none}
+.switchrow{display:flex;justify-content:space-between;align-items:center;padding:8px 2px;font-size:11.5px;font-weight:600}.switchrow small{display:block;color:var(--muted);font-weight:400;font-size:10px;margin-top:3px}.switchrow input{accent-color:var(--cyan);width:17px;height:17px}
+#phaseCard{border:1px solid #28516a;border-radius:12px;background:linear-gradient(145deg,#123049,#0d1a2b);padding:12px 13px}#phaseCard h3{font:700 15px var(--fontd);color:var(--cyan);margin:0 0 6px}#phaseCard p{font-size:11.5px;line-height:1.5;color:#c9d7e9;margin:0}#phaseCard .tip{margin-top:8px;padding:8px;background:#081525a8;border-radius:8px;color:#8ed9ed;font-size:10.5px;line-height:1.45}
+#legend{display:grid;grid-template-columns:1fr 1fr;gap:6px}.chip{display:flex;align-items:center;gap:7px;text-align:left;padding:7px 8px;border-radius:8px;border:1px solid var(--line);background:#111f35;font-size:10.5px;font-weight:600;min-width:0}.chip i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 7px var(--c);flex:none}.chip:hover,.chip.active{border-color:var(--c);background:#1a2d49}
+.note{font-size:10px;color:#8296b4;line-height:1.5}.keys{font-size:9.5px;color:#8296b4;line-height:1.8}.keys b{background:#1a2b46;padding:2px 5px;border-radius:4px;color:#dbe8fa}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);padding:9px 16px;border-radius:30px;background:#10233b;border:1px solid #4b9cc5;z-index:20;opacity:0;transition:.2s;pointer-events:none}#toast.show{opacity:1}
+#loader{position:absolute;inset:0;display:grid;place-items:center;background:#091525;z-index:10;transition:opacity .4s}#loader.done{opacity:0;pointer-events:none}#loader div{text-align:center;color:var(--muted)}#loader b{display:block;color:var(--cyan);font:700 18px var(--fontd);margin-bottom:8px}
+@media(max-width:920px){body{overflow:auto}#app{height:auto;min-height:100dvh;grid-template-columns:1fr;grid-template-rows:58px 58vh auto}#stage{min-height:440px}#panel{border-left:0;border-top:1px solid var(--line);overflow:visible}#hint{display:none}header p{display:none}h1{font-size:16px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<div id="app">
+<header>
+ <div class="logo">⌁</div><div><h1>RODILLA <span>3D</span></h1><p>Laboratorio interactivo · Anatomía, ligamentos y meniscos</p></div>
+ <div class="spacer"></div><button class="headbtn" id="sound">♫ Sonido: apagado</button><button class="headbtn" id="full">⛶</button>
+</header>
+<main id="stage">
+ <div id="viewport"></div>
+ <div id="badge"><b id="badgeTitle">RODILLA SANA</b><small id="badgeSub">Vista anatómica · estructuras principales</small></div>
+ <div id="hint">Arrastra para orbitar · rueda para acercar · selecciona una estructura</div>
+ <div id="info"><button id="closeInfo">×</button><strong id="infoTitle"></strong><p id="infoText"></p></div>
+ <div id="timeline"><div class="top"><span id="modeLabel">ANATOMÍA COMPLETA</span><span id="angleLabel">Flexión: 15°</span></div><div id="progress"><i id="bar"></i></div><div class="phases"><span>Fémur</span><span>Articulación</span><span>Tibia</span></div></div>
+ <div id="loader"><div><b>PREPARANDO LABORATORIO 3D…</b>Cargando modelo anatómico interactivo</div></div>
+</main>
+<aside id="panel">
+ <section class="sec">
+  <h2>Exploración</h2>
+  <div class="grid2"><button class="btn primary" id="play">▶ Reproducir</button><button class="btn" id="step">↻ Flexionar</button></div>
+  <div class="control"><div class="label"><span>Ángulo de flexión</span><output id="flexOut">15°</output></div><input id="flex" type="range" min="0" max="120" value="15" step="1"></div>
+  <div class="control"><div class="label"><span>Separación de estructuras</span><output id="explodeOut">0%</output></div><input id="explode" type="range" min="0" max="100" value="0"></div>
+  <div class="control"><button class="btn wide" id="explodeBtn">DESPIECE ANATÓMICO</button></div>
+ </section>
+ <section class="sec">
+  <h2>Simulador de lesiones</h2>
+  <select id="injury">
+   <option value="healthy">Rodilla sana · referencia</option>
+   <option value="acl">Rotura completa del LCA</option>
+   <option value="pcl">Rotura completa del LCP</option>
+   <option value="meniscus">Rotura radial del menisco medial</option>
+   <option value="bucket">Rotura en asa de balde · menisco medial</option>
+  </select>
+  <p class="note" id="injuryDesc">Selecciona una lesión para comparar su representación con la anatomía sana. La visualización es esquemática.</p>
+ </section>
+ <section class="sec">
+  <h2>Visualización</h2>
+  <label class="switchrow"><span>Corte / vista interior<small>Oculta la rótula para observar la articulación</small></span><input type="checkbox" id="cut" checked></label>
+  <label class="switchrow"><span>Etiquetas anatómicas<small>Nombres sobre el modelo</small></span><input type="checkbox" id="labels" checked></label>
+  <label class="switchrow"><span>Giro automático<small>La cámara orbita lentamente</small></span><input type="checkbox" id="rotate"></label>
+  <div class="control"><div class="label"><span>Calidad gráfica</span></div><select id="quality"><option value="high">Alta</option><option value="medium" selected>Media</option><option value="low">Baja</option></select></div>
+ </section>
+ <section class="sec">
+  <h2>Ángulos de cámara</h2>
+  <div class="grid2"><button class="btn cam" data-view="front">Frontal</button><button class="btn cam" data-view="side">Lateral</button><button class="btn cam" data-view="top">Superior</button><button class="btn cam" data-view="iso">Isométrica</button></div>
+ </section>
+ <section class="sec">
+  <h2>Ficha anatómica</h2><div id="phaseCard"><h3 id="cardTitle">Ligamentos cruzados</h3><p id="cardDesc">El LCA y el LCP se cruzan en el centro de la rodilla y ayudan a controlar el desplazamiento entre fémur y tibia.</p><div class="tip" id="cardTip">Observa cómo se cruzan dentro de la articulación.</div></div>
+ </section>
+ <section class="sec">
+  <h2>Estructuras seleccionables</h2><div id="legend"></div><p class="note">Selecciona una estructura aquí o directamente en el modelo 3D para ver su función.</p>
+ </section>
+ <section class="sec">
+  <h2>Acciones</h2><div class="grid2"><button class="btn" id="reset">Reiniciar</button><button class="btn primary" id="capture">Captura PNG</button></div>
+  <p class="keys">Atajos: <b>Espacio</b> reproducir · <b>E</b> despiece · <b>C</b> corte · <b>R</b> reiniciar · <b>Esc</b> cerrar ficha</p>
+ </section>
+ <p class="note">Material educativo. Las formas y roturas están simplificadas y no representan una lesión individual ni sustituyen la evaluación médica o una resonancia magnética.</p>
+</aside>
+</div><div id="toast"></div>
+<script type="module">
+const $=s=>document.querySelector(s), clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), V=(x,y,z)=>new THREE.Vector3(x,y,z);
+let THREE,OrbitControls,scene,camera,renderer,controls,composer,bloom,clock;
+const state={flex:15,playing:false,explode:0,cut:true,labels:true,rotate:false,injury:'healthy',selected:null,quality:'medium',sound:false};
+const parts={},pickables=[],labels=[];
+const colors={bone:0xe8d6b9,cart:0x76d5c8,acl:0x36c9e8,pcl:0x9e8aff,coll:0xf1c36b,men:0xd6a5ff,pat:0xe4cdb0,tear:0xff4f64};
+const info={
+ femur:['Fémur','Es el hueso del muslo. Su extremo inferior forma los cóndilos femorales, que articulan con la tibia.'],
+ tibia:['Tibia','Hueso principal de la pierna. Recibe la carga del cuerpo y forma la parte inferior de la articulación de la rodilla.'],
+ fibula:['Peroné (fíbula)','Hueso lateral de la pierna. No soporta directamente la mayor parte de la carga de la articulación de la rodilla.'],
+ patella:['Rótula','Hueso situado delante de la articulación. Protege la zona anterior y mejora la palanca del músculo cuádriceps.'],
+ acl:['Ligamento cruzado anterior (LCA)','Conecta la tibia con el fémur dentro de la articulación. Ayuda a limitar el desplazamiento anterior de la tibia y contribuye al control rotacional.'],
+ pcl:['Ligamento cruzado posterior (LCP)','Se cruza con el LCA y ayuda a limitar el desplazamiento posterior de la tibia respecto al fémur.'],
+ mcl:['Ligamento colateral medial (LCM)','Está en el lado interno de la rodilla y ayuda a resistir fuerzas que abren la articulación por su lado medial.'],
+ lcl:['Ligamento colateral lateral (LCL)','Está en el lado externo y ayuda a estabilizar la rodilla frente a fuerzas laterales.'],
+ menM:['Menisco medial (interno)','Estructura de fibrocartílago en forma de C situada entre fémur y tibia, en el lado interno. Distribuye cargas y mejora la congruencia articular.'],
+ menL:['Menisco lateral (externo)','Estructura de fibrocartílago en forma de C situada en el lado externo. Ayuda a distribuir cargas y amortiguar fuerzas.'],
+ cartilage:['Cartílago articular','Cubre los extremos de los huesos dentro de la articulación. Facilita el deslizamiento y ayuda a distribuir la carga.']
+};
+function toast(s){const t=$('#toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900)}
+function mat(color,roughness=.5,metalness=0,extra={}){return new THREE.MeshStandardMaterial({color,roughness,metalness,...extra})}
+function addMesh(id,geo,material,parent=scene,pos=[0,0,0]){const m=new THREE.Mesh(geo,material);m.position.set(...pos);m.castShadow=true;m.receiveShadow=true;m.userData.partId=id;parent.add(m);if(id){(parts[id]??=[]).push(m);pickables.push(m)}return m}
+function groupPart(id,offset=[0,0,0]){const g=new THREE.Group();g.userData.partId=id;g.userData.offset=V(...offset);scene.add(g);parts[id]=[g];pickables.push(g);return g}
+function tube(id,points,r,color,parent=scene,material=null){const curve=new THREE.CatmullRomCurve3(points.map(p=>V(...p)));const mesh=addMesh(id,new THREE.TubeGeometry(curve,48,r,10,false),material||mat(color,.38,.08),parent);return mesh}
+function boneShape(id,position,scale){const g=groupPart(id);g.position.set(...position);const m=mat(colors.bone,.34,.03);const core=addMesh(id,new THREE.CapsuleGeometry(.48,2.2,8,20),m,g,[0,0,0]);core.scale.set(...scale);return g}
+function makeKnee(){
+ const bone=mat(colors.bone,.34,.03), boneHi=mat(0xf1e2cc,.32,.02), cartilage=mat(colors.cart,.25,.02,{transparent:true,opacity:.9}), ligament=mat(colors.acl,.35,.05), pclMat=mat(colors.pcl,.35,.05), collMat=mat(colors.coll,.4,.02), menMat=mat(colors.men,.3,.02);
+ const fem=groupPart('femur',[0,0,0]);
+ addMesh('femur',new THREE.CylinderGeometry(.48,.62,2.35,32),bone,fem,[0,1.6,0]);
+ addMesh('femur',new THREE.SphereGeometry(.7,32,24),bone,fem,[-.48,.25,0]).scale.set(1,.82,1);
+ addMesh('femur',new THREE.SphereGeometry(.7,32,24),bone,fem,[.48,.25,0]).scale.set(1,.82,1);
+ // tibial plateau and shaft
+ const tib=groupPart('tibia',[0,0,0]);
+ addMesh('tibia',new THREE.CylinderGeometry(.52,.38,2.35,32),bone,tib,[0,-1.45,0]);
+ addMesh('tibia',new THREE.BoxGeometry(1.9,.34,1.18),boneHi,tib,[0,-.22,0]);
+ // fibula on lateral side
+ const fib=groupPart('fibula',[0,0,0]);
+ addMesh('fibula',new THREE.CylinderGeometry(.16,.12,2.05,18),boneHi,fib,[1.05,-1.35,0]);
+ addMesh('fibula',new THREE.SphereGeometry(.22,18,14),boneHi,fib,[1.05,-.28,0]);
+ // cartilage caps on condyles / tibial plateau
+ addMesh('cartilage',new THREE.SphereGeometry(.63,28,20),cartilage,scene,[-.48,.25,.01]).scale.set(1,.22,1);
+ addMesh('cartilage',new THREE.SphereGeometry(.63,28,20),cartilage,scene,[.48,.25,.01]).scale.set(1,.22,1);
+ addMesh('cartilage',new THREE.BoxGeometry(1.72,.09,1.02),cartilage,scene,[0,-.02,.02]);
+ // patella anterior, and patellar tendon
+ const pat=groupPart('patella',[0,0,1.05]);
+ addMesh('patella',new THREE.SphereGeometry(.48,28,22),boneHi,pat,[0,.42,0]).scale.set(.78,1.15,.48);
+ tube('patella',[[0,.02,1.0],[0,-.38,1.0],[0,-.72,.75]],.12,colors.coll);
+ // cruciates cross inside notch, attach between tibial eminence and femoral condyles
+ const aclGroup=groupPart('acl',[0,0,0]);
+ tube('acl',[[-.25,-.16,.22],[-.38,.18,.16],[-.2,.62,.1],[.27,1.12,.05]],.105,colors.acl,aclGroup,ligament);
+ const pclGroup=groupPart('pcl',[0,0,0]);
+ tube('pcl',[[.25,-.15,-.05],[.38,.22,-.08],[.24,.68,-.04],[-.28,1.13,-.02]],.12,colors.pcl,pclGroup,pclMat);
+ // collateral ligaments along sides
+ const mcl=groupPart('mcl');
+ tube('mcl',[[-.83,.58,.08],[-1.0,.05,.1],[-.82,-.5,.08]],.105,colors.coll,mcl);
+ const lcl=groupPart('lcl');
+ tube('lcl',[[.83,.55,.08],[1.04,.05,.1],[1.05,-.48,.08]],.09,colors.coll,lcl);
+ // Menisci as C-shaped arcs lying on tibial plateau
+ function meniscus(id,cx,mirror=false){
+  const pts=[];for(let i=0;i<=48;i++){const a=(-.78+1.56*i/48)*Math.PI;pts.push([cx+.48*Math.cos(a),-.03,.42*Math.sin(a)])}
+  // use curve tube for horseshoe-like crescent
+  const g=groupPart(id);const curve=new THREE.CatmullRomCurve3(pts.map(p=>V(...p)));
+  addMesh(id,new THREE.TubeGeometry(curve,64,.115,12,false),menMat,g);
+  // thickness visual bulge on anterior horn
+  return g;
+ }
+ meniscus('menM',-.48);meniscus('menL',.48);
+ // surface and soft capsule
+ const shell=new THREE.Mesh(new THREE.TorusGeometry(1.02,.025,8,64),mat(0x5c8296,.7,.0,{transparent:true,opacity:.5}));
+ shell.rotation.x=Math.PI/2;shell.position.y=-.02;scene.add(shell);
+}
+function addLabel(id,text,pos,color){const el=document.createElement('div');el.className='tag';el.textContent=text;el.style.cssText=`position:absolute;z-index:2;pointer-events:none;padding:4px 7px;border-radius:6px;background:#081525df;border:1px solid ${color};color:#eaf4ff;font:600 10px var(--fontd);white-space:nowrap;transform:translate(-50%,-50%);`;$('#stage').appendChild(el);labels.push({id,pos:V(...pos),el})}
+function initLabels(){addLabel('femur','FÉMUR',[-.9,2.3,.1],'#e8d6b9');addLabel('tibia','TIBIA',[.0,-1.5,.3],'#e8d6b9');addLabel('patella','RÓTULA',[0,.4,1.55],'#e8d6b9');addLabel('acl','LCA',[-.1,.48,.35],'#42c9e8');addLabel('pcl','LCP',[.34,.55,-.1],'#ba91ff');addLabel('menM','MENISCO MEDIAL',[-.85,-.08,.55],'#d6a5ff');addLabel('menL','MENISCO LATERAL',[.85,-.08,.55],'#d6a5ff');addLabel('mcl','LCM',[-1.1,.05,.2],'#f1c36b');addLabel('lcl','LCL',[1.12,.05,.2],'#f1c36b')}
+function showInfo(id){state.selected=id;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.id===id));if(!id){$('#info').classList.remove('show');return}const d=info[id];if(d){$('#infoTitle').textContent=d[0];$('#infoText').textContent=d[1];$('#info').classList.add('show');$('#cardTitle').textContent=d[0];$('#cardDesc').textContent=d[1];$('#cardTip').textContent='Observa su ubicación en relación con los huesos y las demás estructuras.'}}
+function applyInjury(){
+ // Reset visibility and restore base positions; injury-specific display changes
+ Object.values(parts).flat().forEach(o=>{if(o.material?.emissive)o.material.emissive.setHex(0x000000);o.visible=true});
+ const id=state.injury;
+ const desc={
+ healthy:'Referencia anatómica sin lesión representada. Los ligamentos cruzados y ambos meniscos aparecen continuos.',
+ acl:'Representación esquemática de una rotura completa del LCA: se interrumpe la continuidad del ligamento. El LCP permanece visible.',
+ pcl:'Representación esquemática de una rotura completa del LCP. El LCA permanece visible.',
+ meniscus:'Rotura radial: una hendidura atraviesa el espesor del menisco medial y altera su continuidad circular.',
+ bucket:'Rotura en asa de balde: un fragmento longitudinal del menisco medial se desplaza hacia el centro de la articulación.'
+ };
+ $('#injuryDesc').textContent=desc[id];
+ $('#badgeTitle').textContent=id==='healthy'?'RODILLA SANA':id==='acl'?'ROTURA DEL LCA':id==='pcl'?'ROTURA DEL LCP':'ROTURA DE MENISCO';
+ $('#badgeSub').textContent=id==='healthy'?'Vista anatómica · estructuras principales':'Lesión ilustrativa · modelo simplificado';
+ if(id==='acl'||id==='pcl'){
+  const target=id==='acl'?'acl':'pcl';
+  const arr=parts[target]; if(arr){arr.forEach(o=>o.visible=false)}
+  // two torn ends, visibly separated, with red-highlighted tips
+  const points=id==='acl'?[[-.25,-.16,.22],[-.38,.18,.16],[-.2,.42,.1]]:[[.25,-.15,-.05],[.38,.22,-.08],[.24,.43,-.04]];
+  const upper=id==='acl'?[[ -.2,.74,.1],[.27,1.12,.05]]:[[.24,.82,-.04],[-.28,1.13,-.02]];
+  const group=new THREE.Group();group.name='injuryVisual';scene.add(group);
+  const red=mat(colors.tear,.28,.05,{emissive:colors.tear,emissiveIntensity:.3});
+  const curve1=new THREE.CatmullRomCurve3(points.map(p=>V(...p)));
+  const curve2=new THREE.CatmullRomCurve3(upper.map(p=>V(...p)));
+  addMesh(null,new THREE.TubeGeometry(curve1,24,.105,10,false),red,group);
+  addMesh(null,new THREE.TubeGeometry(curve2,24,.105,10,false),red,group);
+  parts.injury=[group];
+ }else if(id==='meniscus'||id==='bucket'){
+  const arr=parts.menM;if(arr)arr.forEach(o=>o.visible=false);
+  const g=new THREE.Group();g.name='injuryVisual';scene.add(g);
+  const red=mat(colors.tear,.25,.02,{emissive:colors.tear,emissiveIntensity:.35});
+  // Broken C-shaped meniscus segments; radial gap or displaced central fragment
+  const leftPts=[[-.98,-.03,.15],[-1.02,-.03,.36],[-.88,-.03,.58],[-.65,-.03,.66]];
+  const rightPts=[[-.31,-.03,.65],[-.12,-.03,.5],[-.06,-.03,.27]];
+  for(const pts of [leftPts,rightPts]){const c=new THREE.CatmullRomCurve3(pts.map(p=>V(...p)));addMesh(null,new THREE.TubeGeometry(c,28,.115,10,false),red,g)}
+  if(id==='bucket'){
+   const frag=new THREE.Mesh(new THREE.BoxGeometry(.18,.12,.75),red);frag.position.set(-.42,.13,.18);frag.rotation.z=-.22;g.add(frag);
+  }
+  parts.injury=[g];
+ }
+}
+function clearInjury(){if(parts.injury){parts.injury.forEach(o=>{scene.remove(o);o.traverse?.(x=>{if(x.geometry)x.geometry.dispose()})});delete parts.injury}}
+function setInjury(id){clearInjury();state.injury=id;applyInjury();toast(id==='healthy'?'Anatomía sana':'Vista de lesión actualizada')}
+function updateLabels(){for(const l of labels){const p=l.pos.clone().project(camera);const x=(p.x*.5+.5)*$('#stage').clientWidth,y=(-p.y*.5+.5)*$('#stage').clientHeight;const visible=state.labels&&p.z<1&&x>0&&x<$('#stage').clientWidth&&y>0&&y<$('#stage').clientHeight;l.el.style.display=visible?'block':'none';l.el.style.left=x+'px';l.el.style.top=y+'px';}}
+function selectById(id){showInfo(id);toast(info[id]?.[0]||id)}
+function buildLegend(){const order=['femur','tibia','fibula','patella','acl','pcl','mcl','lcl','menM','menL','cartilage'];const names={femur:'Fémur',tibia:'Tibia',fibula:'Peroné',patella:'Rótula',acl:'LCA',pcl:'LCP',mcl:'LCM',lcl:'LCL',menM:'Menisco medial',menL:'Menisco lateral',cartilage:'Cartílago'};const cs={femur:'#e8d6b9',tibia:'#e8d6b9',fibula:'#cdbb9e',patella:'#e8d6b9',acl:'#42c9e8',pcl:'#ba91ff',mcl:'#f1c36b',lcl:'#f1c36b',menM:'#d6a5ff',menL:'#d6a5ff',cartilage:'#63d6aa'};for(const id of order){const b=document.createElement('button');b.className='chip';b.dataset.id=id;b.style.setProperty('--c',cs[id]);b.innerHTML=`<i></i><span>${names[id]}</span>`;b.onclick=()=>selectById(id);$('#legend').appendChild(b)}}
+function updateExplode(){const e=state.explode;const offsets={femur:[0,1.2,0],tibia:[0,-1.1,0],fibula:[.45,-1.15,0],patella:[0,0,1.0],acl:[-.2,.0,.35],pcl:[.2,0,-.35],mcl:[-.4,0,0],lcl:[.4,0,0],menM:[-.4,-.1,.25],menL:[.4,-.1,.25]};for(const [id,objs] of Object.entries(parts)){if(id==='injury')continue;const off=offsets[id];if(!off)continue;const g=objs[0];if(g.isGroup){const base=g.userData.base||V(0,0,0);g.position.set(base.x+off[0]*e,base.y+off[1]*e,base.z+off[2]*e)}}
+}
+function resetPositions(){for(const [id,objs] of Object.entries(parts)){if(id==='injury')continue;const g=objs[0];if(g.isGroup)g.position.copy(g.userData.base||V(0,0,0))}}
+function setup(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x091525);scene.fog=new THREE.Fog(0x091525,10,25);
+ camera=new THREE.PerspectiveCamera(42,1,.1,80);camera.position.set(4.6,2.7,8.8);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;$('#viewport').appendChild(renderer.domElement);
+ controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.07;controls.minDistance=4;controls.maxDistance=16;controls.target.set(0,.15,0);
+ scene.add(new THREE.HemisphereLight(0xb9d8ff,0x342b25,.95));const key=new THREE.DirectionalLight(0xffe8cf,2.1);key.position.set(5,7,6);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);const rim=new THREE.DirectionalLight(0x4bbde8,1.25);rim.position.set(-5,2,-5);scene.add(rim);const fill=new THREE.PointLight(0xc28cff,.7,12);fill.position.set(2,-1,4);scene.add(fill);
+ const floor=new THREE.Mesh(new THREE.CircleGeometry(4,64),mat(0x10243a,.75));floor.rotation.x=-Math.PI/2;floor.position.y=-3.05;floor.receiveShadow=true;scene.add(floor);
+ makeKnee();for(const [id,arr] of Object.entries(parts)){const g=arr[0];if(g.isGroup)g.userData.base=g.position.clone()}
+ initLabels();buildLegend();
+ const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+ renderer.domElement.addEventListener('pointerdown',e=>down=[e.clientX,e.clientY]);
+ renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>5)return;const r=renderer.domElement.getBoundingClientRect();ptr.x=(e.clientX-r.left)/r.width*2-1;ptr.y=-(e.clientY-r.top)/r.height*2+1;ray.setFromCamera(ptr,camera);const hit=ray.intersectObjects(pickables,true).find(h=>h.object.visible);if(hit){let o=hit.object;while(o&&!o.userData.partId)o=o.parent;if(o?.userData.partId)selectById(o.userData.partId)}else showInfo(null);down=null});
+ clock=new THREE.Clock();
+ const resize=()=>{const w=$('#viewport').clientWidth,h=$('#viewport').clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()};new ResizeObserver(resize).observe($('#viewport'));resize();
+ renderer.setAnimationLoop(()=>{const dt=Math.min(clock.getDelta(),.04);if(state.playing){state.flex=state.flex>=115?0:state.flex+dt*28;$('#flex').value=Math.round(state.flex);syncFlex()}const angle=state.flex;$('#angleLabel').textContent='Flexión: '+Math.round(angle)+'°';$('#bar').style.width=(angle/120*100)+'%';controls.autoRotate=state.rotate;const bend=state.flex*Math.PI/180*.55;if(parts.tibia?.[0])parts.tibia[0].rotation.x=-bend;if(parts.fibula?.[0])parts.fibula[0].rotation.x=-bend;controls.update();updateLabels();renderer.render(scene,camera)});
+ $('#loader').classList.add('done');
+}
+function syncFlex(){$('#flexOut').textContent=Math.round(state.flex)+'°';$('#flex').value=state.flex;$('#angleLabel').textContent='Flexión: '+Math.round(state.flex)+'°';}
+function setQuality(q){state.quality=q;const d=q==='high'?Math.min(devicePixelRatio,2):q==='medium'?Math.min(devicePixelRatio,1.5):1;renderer.setPixelRatio(d);renderer.setSize($('#viewport').clientWidth,$('#viewport').clientHeight);toast('Calidad gráfica: '+q)}
+function bind(){
+ $('#flex').oninput=e=>{state.flex=+e.target.value;syncFlex()};
+ $('#play').onclick=()=>{state.playing=!state.playing;$('#play').textContent=state.playing?'Ⅱ Pausar':'▶ Reproducir'};
+ $('#step').onclick=()=>{state.playing=false;state.flex=state.flex>=100?0:state.flex+15;syncFlex();$('#play').textContent='▶ Reproducir'};
+ $('#explode').oninput=e=>{state.explode=+e.target.value/100;$('#explodeOut').textContent=e.target.value+'%';updateExplode()};
+ $('#explodeBtn').onclick=()=>{state.explode=state.explode?0:1;$('#explode').value=state.explode*100;$('#explodeOut').textContent=Math.round(state.explode*100)+'%';updateExplode();$('#explodeBtn').textContent=state.explode?'ARMAR ESTRUCTURAS':'DESPIECE ANATÓMICO'};
+ $('#injury').onchange=e=>setInjury(e.target.value);
+ $('#cut').onchange=e=>{state.cut=e.target.checked;parts.patella?.forEach(o=>o.visible=!state.cut);toast(state.cut?'Vista interior activada':'Rótula visible')};
+ $('#labels').onchange=e=>{state.labels=e.target.checked;updateLabels()};
+ $('#rotate').onchange=e=>state.rotate=e.target.checked;
+ $('#quality').onchange=e=>setQuality(e.target.value);
+ $('#closeInfo').onclick=()=>showInfo(null);
+ $('#reset').onclick=()=>{state.flex=15;state.explode=0;state.playing=false;state.injury='healthy';$('#injury').value='healthy';$('#explode').value=0;$('#explodeOut').textContent='0%';$('#explodeBtn').textContent='DESPIECE ANATÓMICO';resetPositions();setInjury('healthy');syncFlex();showInfo(null);toast('Simulador reiniciado')};
+ $('#capture').onclick=()=>{const a=document.createElement('a');a.download='rodilla-3d.png';a.href=renderer.domElement.toDataURL('image/png');a.click();toast('Captura PNG generada')};
+ $('#full').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+ $('#sound').onclick=()=>{state.sound=!state.sound;$('#sound').textContent=state.sound?'♫ Sonido: activado':'♫ Sonido: apagado';toast('El sonido ambiental no está implementado en esta versión')};
+ document.querySelectorAll('.cam').forEach(b=>b.onclick=()=>{const v=b.dataset.view;if(v==='front')camera.position.set(0,.1,10);if(v==='side')camera.position.set(10,.4,0);if(v==='top')camera.position.set(.2,9,.2);if(v==='iso')camera.position.set(4.6,2.7,8.8);controls.target.set(0,.15,0);controls.update()});
+ window.addEventListener('keydown',e=>{if(/INPUT|SELECT/.test(e.target.tagName))return;if(e.code==='Space'){e.preventDefault();$('#play').click()}if(e.key.toLowerCase()==='e')$('#explodeBtn').click();if(e.key.toLowerCase()==='c'){$('#cut').click()}if(e.key.toLowerCase()==='r')$('#reset').click();if(e.key==='Escape')showInfo(null)});
+}
+async function main(){try{THREE=await import('three');({OrbitControls}=await import('three/addons/controls/OrbitControls.js'));setup();bind();}catch(e){console.error(e);$('#loader').innerHTML='<div><b>No se pudo cargar el modelo 3D</b>Comprueba tu conexión a internet y recarga la página.</div>'}}
+main();
+</script>
+</body>
+</html>
